@@ -7,8 +7,6 @@ This project automates the process of searching for terms on Google Trends and d
 - [Technologies Used](#technologies-used)
 - [Required Libraries](#required-libraries)
 - [Installation](#installation)
-- [Usage](#usage)
-- [License](#license)
 
 ## Features
 - Open Google Trends website.
