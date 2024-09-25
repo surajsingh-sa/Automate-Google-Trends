@@ -1,0 +1,91 @@
+import time
+from selenium import webdriver
+from selenium.webdriver import Keys
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+def setup_driver():
+    # Set up Chrome options to disable the "Chrome is being controlled" message
+    chrome_options = Options()
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+
+    # Initialize the Chrome WebDriver with the modified options
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.maximize_window()
+    return driver
+
+def open_google_trends(driver):
+    # Open the Google Trends website
+    driver.get('https://trends.google.com/trends/?geo=US')
+
+def search_term(driver, term):
+    # Wait for the search input to be available and locate it by its id
+    search_box = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, 'i7'))
+    )
+    # Search for the specified term
+    search_box.send_keys(term)
+
+    # Wait for the "Explore" button to become clickable and click it
+    explore_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='Explore']]"))
+    )
+    explore_button.click()
+
+def download_csv(driver):
+    # Wait for the page to load results
+    time.sleep(5)
+
+    # Wait for the "Download CSV" button to become clickable and click it
+    download_button = WebDriverWait(driver, 20).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'export') and @title='CSV']"))
+    )
+    download_button.click()
+
+    # Wait for the download to complete
+    time.sleep(1)
+
+def repeat_search_and_download(driver, term):
+    # Locate the new search input for adding a new search term
+    new_search_box = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, 'input-29'))
+    )
+
+    # Add the same search term again
+    new_search_box.send_keys(term)
+
+    # Wait for a moment before submitting the search
+    time.sleep(2)
+
+    # Simulate pressing enter to search
+    new_search_box.send_keys(Keys.ENTER)
+
+    # Wait for the new search results to load
+    time.sleep(5)
+
+    # Download the CSV again using the new button HTML
+    download_button_next = WebDriverWait(driver, 20).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[@title='CSV' and contains(@class, 'export')]"))
+    )
+    download_button_next.click()
+
+    # Wait for the download to complete
+    time.sleep(10)
+
+def main():
+    # Main function to run the workflow
+    driver = setup_driver()
+    try:
+        open_google_trends(driver)
+        search_term(driver, "blockchain")
+        download_csv(driver)
+        repeat_search_and_download(driver, "blockchain")
+    finally:
+        # Close the browser
+        driver.quit()
+
+if __name__ == "__main__":
+    main()
