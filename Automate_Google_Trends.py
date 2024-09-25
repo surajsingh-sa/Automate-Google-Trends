@@ -43,10 +43,29 @@ def download_csv(driver):
     download_button = WebDriverWait(driver, 20).until(
         EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'export') and @title='CSV']"))
     )
-    download_button.click()
+    # download_button.click()
 
     # Wait for the download to complete
     time.sleep(1)
+
+def scroll_to_related_queries_section(driver):
+    """Scroll down to the 'Related queries' section and ensure it's visible."""
+    wait = WebDriverWait(driver, 10)
+
+    while True:
+        try:
+            # Try to locate the 'Related queries' header using WebDriverWait to wait until it is present in the DOM
+            related_queries_section = wait.until(EC.presence_of_element_located(
+                (By.XPATH, "//div[contains(@class, 'fe-atoms-generic-title') and contains(text(), 'Related queries')]")
+            ))
+
+            # Scroll to the 'Related queries' section
+            driver.execute_script("arguments[0].scrollIntoView(true);", related_queries_section)
+            return related_queries_section
+        except Exception as e:
+            # Scroll down if the section is not found yet, until we reach the bottom of the page
+            driver.execute_script("window.scrollBy(0, 500);")
+            time.sleep(1)  # Pause for the scroll to take effect
 
 def repeat_search_and_download(driver, term):
     # Locate the new search input for adding a new search term
@@ -66,14 +85,21 @@ def repeat_search_and_download(driver, term):
     # Wait for the new search results to load
     time.sleep(5)
 
-    # Download the CSV again using the new button HTML
-    download_button_next = WebDriverWait(driver, 20).until(
-        EC.element_to_be_clickable((By.XPATH, "//button[@title='CSV' and contains(@class, 'export')]"))
-    )
-    download_button_next.click()
+    # Scroll to the 'Related queries' section
+    related_queries_section = scroll_to_related_queries_section(driver)
 
-    # Wait for the download to complete
-    time.sleep(10)
+    # Once in view, find the download button within this section's widget-actions div
+    csv_button_xpath = ".//following-sibling::widget-actions//button[@title='CSV']"
+    download_button = related_queries_section.find_element(By.XPATH, csv_button_xpath)
+
+    # Scroll to the button to ensure it is visible
+    driver.execute_script("arguments[0].scrollIntoView(true);", download_button)
+
+    # Click the download button
+    download_button.click()
+
+    # Wait for the download to complete (adjust timing as necessary)
+    time.sleep(5)
 
 def main():
     # Main function to run the workflow
