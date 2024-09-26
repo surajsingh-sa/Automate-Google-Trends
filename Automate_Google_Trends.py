@@ -19,7 +19,7 @@ def setup_driver():
 
 def open_google_trends(driver):
     # Open the Google Trends website
-    driver.get('https://trends.google.com/trends/?geo=US')
+    driver.get('https://trends.google.com/trends/?geo=DE&q=blockchain&hl=en')
 
 def search_term(driver, term):
     # Wait for the search input to be available and locate it by its id
@@ -67,6 +67,24 @@ def scroll_to_related_queries_section(driver):
             driver.execute_script("window.scrollBy(0, 500);")
             time.sleep(1)  # Pause for the scroll to take effect
 
+def select_germany_filter(driver):
+    # Locate the dropdown element
+    dropdown_element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//div[contains(@class, '_md-select-value')]"))
+    )
+
+    # Click the dropdown to open options
+    dropdown_element.click()
+
+    # Wait for the options to become visible
+    time.sleep(2)
+
+    # Locate and select "Germany" from the options
+    germany_option = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//md-option//span[contains(text(), 'Germany')]"))
+    )
+    germany_option.click()
+
 def repeat_search_and_download(driver, term):
     # Locate the new search input for adding a new search term
     new_search_box = WebDriverWait(driver, 10).until(
@@ -85,6 +103,9 @@ def repeat_search_and_download(driver, term):
     # Wait for the new search results to load
     time.sleep(5)
 
+    # Call the function to select Germany
+    # select_germany_filter(driver)
+    time.sleep(1)
     # Scroll to the 'Related queries' section
     related_queries_section = scroll_to_related_queries_section(driver)
 
