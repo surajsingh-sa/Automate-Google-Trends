@@ -72,41 +72,46 @@ def scroll_to_related_queries_section(driver):
             time.sleep(1)  # Pause for the scroll to take effect
 
 
-def repeat_search_and_download(driver, term):
+def repeat_search_and_download(driver, term, max_retries=5):
     driver.get(f"https://trends.google.com/trends/explore?date=today%203-m&q={term}&hl=en")
-    # Refresh the page twice
-    for _ in range(2):
-        driver.refresh()
-        time.sleep(2)  # Adding a slight delay between refreshes for stability
-    # # Locate the new search input for adding a new search term
-    # new_search_box = WebDriverWait(driver, 10).until(
-    #     EC.presence_of_element_located((By.ID, 'input-29'))
-    # )
-    #
-    # # Add the same search term again
-    # new_search_box.send_keys(term)
-    #
-    # # Wait for a moment before submitting the search
-    # time.sleep(2)
-    # # Simulate pressing enter to search
-    # new_search_box.send_keys(Keys.ENTER)
 
-    time.sleep(2)
-    # Scroll to the 'Related queries' section
-    related_queries_section = scroll_to_related_queries_section(driver)
+    retries = 0
+    data_found = False
 
-    # Once in view, find the download button within this section's widget-actions div
-    csv_button_xpath = ".//following-sibling::widget-actions//button[@title='CSV']"
-    download_button = related_queries_section.find_element(By.XPATH, csv_button_xpath)
+    while retries < max_retries and not data_found:
+        try:
+            # Scroll to the 'Related queries' section
+            related_queries_section = scroll_to_related_queries_section(driver)
 
-    # Scroll to the button to ensure it is visible
-    driver.execute_script("arguments[0].scrollIntoView(true);", download_button)
+            # Once in view, find the download button within this section's widget-actions div
+            csv_button_xpath = ".//following-sibling::widget-actions//button[@title='CSV']"
+            download_button = related_queries_section.find_element(By.XPATH, csv_button_xpath)
 
-    # Click the download button
-    download_button.click()
+            # Scroll to the button to ensure it is visible
+            driver.execute_script("arguments[0].scrollIntoView(true);", download_button)
+
+            # If download button is found, click it to download the CSV
+            download_button.click()
+
+            # If the button click worked, assume data was found and break out of the loop
+            data_found = True
+            print("Data found and CSV download initiated.")
+
+        except Exception as e:
+            # If any exception occurs, retry by refreshing the page
+            retries += 1
+            print(f"No data found, refreshing page... Retry {retries}/{max_retries}")
+            driver.refresh()
+            time.sleep(3)  # Adjust this time if necessary to allow the page to fully reload
+
+    if not data_found:
+        print("Maximum retries reached. Data is still not available.")
+    else:
+        print("Download completed successfully.")
 
     # Wait for the download to complete (adjust timing as necessary)
     time.sleep(1)
+
 
 def main():
     # Main function to run the workflow
