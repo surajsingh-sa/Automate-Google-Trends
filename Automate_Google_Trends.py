@@ -74,6 +74,10 @@ def scroll_to_related_queries_section(driver):
 
 def repeat_search_and_download(driver, term):
     driver.get(f"https://trends.google.com/trends/explore?date=today%203-m&q={term}&hl=en")
+    # Refresh the page twice
+    for _ in range(2):
+        driver.refresh()
+        time.sleep(2)  # Adding a slight delay between refreshes for stability
     # # Locate the new search input for adding a new search term
     # new_search_box = WebDriverWait(driver, 10).until(
     #     EC.presence_of_element_located((By.ID, 'input-29'))
