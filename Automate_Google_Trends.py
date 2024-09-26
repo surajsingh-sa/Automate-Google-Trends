@@ -73,6 +73,7 @@ def repeat_search_and_download(driver, term):
         EC.presence_of_element_located((By.ID, 'input-29'))
     )
 
+
     # Add the same search term again
     new_search_box.send_keys(term)
 
