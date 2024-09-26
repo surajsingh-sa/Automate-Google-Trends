@@ -9,8 +9,12 @@ from selenium.webdriver.support import expected_conditions as EC
 def setup_driver():
     # Set up Chrome options to disable the "Chrome is being controlled" message
     chrome_options = Options()
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-infobars")
+    # Uncomment the next line if you want to run Chrome in headless mode (without a GUI)
+    # chrome_options.add_argument("--headless")
 
     # Initialize the Chrome WebDriver with the modified options
     driver = webdriver.Chrome(options=chrome_options)
@@ -102,13 +106,13 @@ def repeat_search_and_download(driver, term):
 
 def main():
     # Main function to run the workflow
-    # search_input = input("Please enter a search term: ")
-    search_input = "Blockchain"
+    search_input = input("Please enter a search term: ")
+    # search_input = "Blockchain"
     driver = setup_driver()
     try:
         open_google_trends(driver, search_input)
         search_term(driver, search_input)
-        download_csv(driver)
+        # download_csv(driver)
         repeat_search_and_download(driver, search_input)
     finally:
         # Close the browser
