@@ -67,24 +67,23 @@ def scroll_to_related_queries_section(driver):
             driver.execute_script("window.scrollBy(0, 500);")
             time.sleep(1)  # Pause for the scroll to take effect
 
+
 def repeat_search_and_download(driver, term):
-    # Locate the new search input for adding a new search term
-    new_search_box = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, 'input-29'))
-    )
+    driver.get(f"https://trends.google.com/trends/explore?date=today%203-m&q={term}&hl=en")
+    # # Locate the new search input for adding a new search term
+    # new_search_box = WebDriverWait(driver, 10).until(
+    #     EC.presence_of_element_located((By.ID, 'input-29'))
+    # )
+    #
+    # # Add the same search term again
+    # new_search_box.send_keys(term)
+    #
+    # # Wait for a moment before submitting the search
+    # time.sleep(2)
+    # # Simulate pressing enter to search
+    # new_search_box.send_keys(Keys.ENTER)
 
-    # Add the same search term again
-    new_search_box.send_keys(term)
-
-    # Wait for a moment before submitting the search
     time.sleep(2)
-
-    # Simulate pressing enter to search
-    new_search_box.send_keys(Keys.ENTER)
-
-    # Wait for the new search results to load
-    time.sleep(5)
-
     # Scroll to the 'Related queries' section
     related_queries_section = scroll_to_related_queries_section(driver)
 
@@ -99,11 +98,12 @@ def repeat_search_and_download(driver, term):
     download_button.click()
 
     # Wait for the download to complete (adjust timing as necessary)
-    time.sleep(5)
+    time.sleep(1)
 
 def main():
     # Main function to run the workflow
-    search_input = input("Please enter a search term: ")
+    # search_input = input("Please enter a search term: ")
+    search_input = "Blockchain"
     driver = setup_driver()
     try:
         open_google_trends(driver, search_input)
